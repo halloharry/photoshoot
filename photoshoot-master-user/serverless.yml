@@ -1,0 +1,70 @@
+plugins:
+  - serverless-domain-manager
+  - serverless-certificate-creator
+
+service: master-user
+frameworkVersion: '3'
+provider:
+  name: aws
+  stage: dev
+  region: ap-southeast-1
+  runtime: java11
+#  endpointType: REGIONAL
+  environment:
+    DOMAIN: ${self:custom.customDomain.domainName}
+    STAGE: ${self:provider.stage}
+    SPRING_PROFILES_ACTIVE: dev
+    JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+  vpc:
+    securityGroupIds:
+      - sg-0f6f75e90fb45c6df # ec2 security group
+    subnetIds:
+      # subnet vpc
+      - subnet-0424505c2a87704c7
+      - subnet-0f4f206ad848e6d93
+      - subnet-0b5f4f1102447ac87
+package:
+  artifact: target/photoshoot-master-user-0.0.1-SNAPSHOT-aws.jar
+
+functions:
+  javaaa:
+    handler: org.springframework.cloud.function.adapter.aws.ContentHandler
+    events:
+      - http:
+          path: /tes
+          method: get
+    environment:
+      spring_cloud_function_definition: javaTestFunction
+  masaaa:
+    handler: org.springframework.cloud.function.adapter.aws.ContentHandler
+    events:
+      - http:
+          path: /masa
+          method: get
+#          cors: true
+    environment:
+      spring_cloud_function_definition: masaFunction
+
+
+custom:
+  domains:
+    dev:
+      domainName: kirakiraphotobox.cloud
+      certificateName: kirakiraphotobox.cloud
+
+  customCertificate:
+    hostedZoneNames: "kirakiraphotobox.cloud."
+    certificateName: ${self:custom.domains.dev.certificateName}
+    region: ap-southeast-1
+
+  customDomain:
+#    apiType: rest
+    domainName: ${self:custom.domains.${self:provider.stage}.domainName}
+    certificateName: ${self:custom.domains.dev.certificateName}
+    createRoute53Record: true
+    autoDomain: true
+    basePath: security
+    stage: ${self:provider.stage}
+    endPointType: regional
+    enabled: true
+    securityPolicy: tls_1_2

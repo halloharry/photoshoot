@@ -1,0 +1,74 @@
+server:
+  port: 8080
+#============================================================================
+# SPRING
+#============================================================================
+spring:
+  application:
+    name: photo-box
+  cloud:
+    function:
+      scan:
+        packages: com.photo.master.user.functions
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${db.host}:${db.port}/${db.name}
+    username: ${db.username}
+    password: ${db.password}
+    hikari:
+      minimumIdle: 1
+      maximumPoolSize: 5
+      idleTimeout: 150000
+      poolName: hikari-photo-box-dev
+      maxLifetime: 539999
+      connectionTimeout: 600000
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+##============================================================================
+## DATABASE
+##============================================================================
+#dev
+#db:
+#  name: photo_box_data_db
+#  host: photoboxdev.cusgavh8lnhe.ap-southeast-1.rds.amazonaws.com
+#  port: 5432
+#  username: photo_box_app
+#  password: As1478963@
+#  auto-reconnect: true
+#  ssl: false
+#
+
+#local
+db:
+  name: java_on_twitter
+  host: localhost
+  port: 5432
+  username: postgres
+  password: 123
+  auto-reconnect: true
+  ssl: false
+
+#=============
+#OAUTH2
+#=============
+
+application:
+  security:
+    jwt:
+      secret-key: 277f414ecf53f55fcbb4def60e736a336845699cd26d405532fd243d2e1efff2
+#      expiration: 864000000 # a day
+      expiration: 864000000 # a day
+      refresh-token:
+        expiration: 6048000000 # 7 days
+#
+logging:
+  level:
+    root: debug

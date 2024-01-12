@@ -1,0 +1,26 @@
+deploy-development-photo-box:
+  dependencies:
+    - package
+  cache:
+    key: npm-cache
+    paths:
+      - node_modules/
+      - .npm/
+    when: always
+  image: node:latest
+  stage: deploy-development
+  before_script:
+    - npm config set prefix /usr/local
+    - npm install serverless
+    - npm install serverless-domain-manager --save-dev
+    - npm install serverless-certificate-creator --save-dev
+  script:
+    - cd photoshoot-master-user
+    - npx serverless create-cert --stage dev --verbose
+    - npx serverless deploy --stage dev --verbose
+  environment: development-master-user
+  only:
+    - test/master-user
+    - testing
+    - develop
+    - main
